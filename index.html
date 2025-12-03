@@ -16,6 +16,9 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         :root {
             --bg-gradient-start: #0f1624;
@@ -1033,6 +1036,30 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
+        // EmailJS Configuration
+        const emailConfig = {
+            serviceId: 'service_wnpmr1e',
+            templateId: 'template_mmm7wgo',
+            publicKey: 'Uh-pIcSxzKRLOMiWQ',
+            recipients: 'henriette.ingvaldsen@gmail.com'
+        };
+
+        // Initialize EmailJS
+        emailjs.init(emailConfig.publicKey);
+
+        // Send email notification
+        function sendEmailNotification(title, message) {
+            emailjs.send(emailConfig.serviceId, emailConfig.templateId, {
+                title: title,
+                message: message,
+                to_email: emailConfig.recipients
+            }).then(() => {
+                console.log('E-post sendt!');
+            }).catch((error) => {
+                console.error('E-post feilet:', error);
+            });
+        }
+
         const people = [
             { id: 1, name: 'Charlotte', household: 1, emoji: '👩', color: '#7eb8da' },
             { id: 2, name: 'Henriette', household: 1, emoji: '👩', color: '#62c4c3' },
@@ -1331,6 +1358,16 @@
             
             document.getElementById('winnerModal').classList.add('show');
             createConfetti();
+            
+            // Send email notification
+            const now = new Date().toLocaleString('no-NO', { 
+                weekday: 'long', day: 'numeric', month: 'long', 
+                hour: '2-digit', minute: '2-digit' 
+            });
+            sendEmailNotification(
+                `🎡 ${winner.name} ble valgt!`,
+                `Lykkehjulet har talt!\n\n${winner.name} ble valgt til å måke snø.\n\nTidspunkt: ${now}`
+            );
         }
 
         function closeWinnerModal() {
@@ -1424,6 +1461,17 @@
             updateUI();
             closePersonPicker();
             showToast(`${person.name} har måkt! ❄️`);
+            
+            // Send email notification
+            const now = new Date().toLocaleString('no-NO', { 
+                weekday: 'long', day: 'numeric', month: 'long', 
+                hour: '2-digit', minute: '2-digit' 
+            });
+            const totalCount = shovelingData.history.filter(e => e.personId === personId).length;
+            sendEmailNotification(
+                `✅ ${person.name} har måket!`,
+                `${person.name} har registrert snømåking.\n\nTidspunkt: ${now}\nTotalt måket: ${totalCount} ${totalCount === 1 ? 'gang' : 'ganger'}`
+            );
         }
 
         function deleteEntry(id) {
