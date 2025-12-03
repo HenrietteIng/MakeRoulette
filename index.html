@@ -1114,25 +1114,25 @@
                 <div class="photos-grid">
                     <div class="photo-upload-card">
                         <div class="photo-upload-wrapper">
-                            <div class="photo-upload-btn has-photo" id="photoBtn1" style="cursor: default;"><span id="photoPreview1">👩</span></div>
+                            <div class="photo-upload-btn has-photo" id="photoBtn1" style="cursor: default;"><span id="photoPreview1"><img src="https://henrietteing.github.io/MakeRoulette/charlotte.png" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></span></div>
                         </div>
                         <span class="photo-upload-name">Charlotte</span>
                     </div>
                     <div class="photo-upload-card">
                         <div class="photo-upload-wrapper">
-                            <div class="photo-upload-btn has-photo" id="photoBtn2" style="cursor: default;"><span id="photoPreview2">👩</span></div>
+                            <div class="photo-upload-btn has-photo" id="photoBtn2" style="cursor: default;"><span id="photoPreview2"><img src="https://henrietteing.github.io/MakeRoulette/henriette.png" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></span></div>
                         </div>
                         <span class="photo-upload-name">Henriette</span>
                     </div>
                     <div class="photo-upload-card">
                         <div class="photo-upload-wrapper">
-                            <div class="photo-upload-btn has-photo" id="photoBtn3" style="cursor: default;"><span id="photoPreview3">👨</span></div>
+                            <div class="photo-upload-btn has-photo" id="photoBtn3" style="cursor: default;"><span id="photoPreview3"><img src="https://henrietteing.github.io/MakeRoulette/jonas.png" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></span></div>
                         </div>
                         <span class="photo-upload-name">Jonas</span>
                     </div>
                     <div class="photo-upload-card">
                         <div class="photo-upload-wrapper">
-                            <div class="photo-upload-btn has-photo" id="photoBtn4" style="cursor: default;"><span id="photoPreview4">👨</span></div>
+                            <div class="photo-upload-btn has-photo" id="photoBtn4" style="cursor: default;"><span id="photoPreview4"><img src="https://henrietteing.github.io/MakeRoulette/kristian.png" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></span></div>
                         </div>
                         <span class="photo-upload-name">Kristian</span>
                     </div>
@@ -1393,7 +1393,7 @@
                 btnEl.classList.add('has-photo');
             } else if (typeof photoData === 'string') {
                 // Old format - just image URL
-                previewEl.innerHTML = `<img src="${photoData}" alt="">`;
+                previewEl.innerHTML = `<img src="${photoData}" alt="" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
                 btnEl.classList.add('has-photo');
             } else {
                 const person = people.find(p => p.id === parseInt(personId));
@@ -1430,12 +1430,20 @@
             }, 2000);
         }
 
+        // Hardcoded photo URLs from GitHub
+        const photoUrls = {
+            1: 'https://henrietteing.github.io/MakeRoulette/charlotte.png',
+            2: 'https://henrietteing.github.io/MakeRoulette/henriette.png',
+            3: 'https://henrietteing.github.io/MakeRoulette/jonas.png',
+            4: 'https://henrietteing.github.io/MakeRoulette/kristian.png'
+        };
+
         function loadPhotos() {
             for (let i = 1; i <= 4; i++) {
-                if (shovelingData.photos[i]) {
-                    tempPhotos[i] = shovelingData.photos[i];
-                    updatePhotoPreview(i);
-                }
+                // Use hardcoded URLs - simple string format
+                shovelingData.photos[i] = photoUrls[i];
+                tempPhotos[i] = photoUrls[i];
+                updatePhotoPreview(i);
             }
             loadImagesForWheel();
         }
@@ -1443,25 +1451,29 @@
         function loadImagesForWheel() {
             loadedImages = {};
             let loaded = 0;
-            const photos = shovelingData.photos;
-            const keys = Object.keys(photos);
-            const toLoad = keys.length;
             
-            if (toLoad === 0) {
-                drawWheel();
-                return;
-            }
+            // Always use the hardcoded URLs for the wheel
+            const wheelPhotos = {
+                1: photoUrls[1],
+                2: photoUrls[2],
+                3: photoUrls[3],
+                4: photoUrls[4]
+            };
+            
+            const keys = Object.keys(wheelPhotos);
+            const toLoad = keys.length;
 
             for (const id of keys) {
-                const photoData = photos[id];
-                const src = photoData.src || photoData; // Handle both new and old format
+                const src = wheelPhotos[id];
                 const img = new Image();
+                img.crossOrigin = 'anonymous';
                 img.onload = () => {
-                    loadedImages[id] = { img, data: photoData };
+                    loadedImages[id] = { img, data: src };
                     loaded++;
                     if (loaded >= toLoad) drawWheel();
                 };
                 img.onerror = () => {
+                    console.log('Failed to load image:', src);
                     loaded++;
                     if (loaded >= toLoad) drawWheel();
                 };
@@ -1518,30 +1530,24 @@
                 ctx.closePath();
                 ctx.clip();
 
-                if (loadedImages[person.id]) {
-                    const { img, data } = loadedImages[person.id];
+                if (loadedImages[person.id] || loadedImages[String(person.id)]) {
+                    const imgData = loadedImages[person.id] || loadedImages[String(person.id)];
+                    const img = imgData.img;
                     const containerSize = photoRadius * 2;
                     
-                    if (data && data.zoom) {
-                        // New format with transform
-                        const scale = data.zoom / 100;
-                        const imgAspect = data.imgWidth / data.imgHeight;
-                        let imgW, imgH;
-                        if (imgAspect > 1) {
-                            imgH = containerSize * scale;
-                            imgW = imgH * imgAspect;
-                        } else {
-                            imgW = containerSize * scale;
-                            imgH = imgW / imgAspect;
-                        }
-                        const offsetScale = containerSize / 220;
-                        const drawX = photoX - imgW/2 + (data.offsetX * offsetScale);
-                        const drawY = photoY - imgH/2 + (data.offsetY * offsetScale);
-                        ctx.drawImage(img, drawX, drawY, imgW, imgH);
+                    // Draw image centered and covering the circle
+                    const imgAspect = img.width / img.height;
+                    let drawW, drawH;
+                    if (imgAspect > 1) {
+                        drawH = containerSize;
+                        drawW = containerSize * imgAspect;
                     } else {
-                        // Old format - just center the image
-                        ctx.drawImage(img, photoX - photoRadius, photoY - photoRadius, containerSize, containerSize);
+                        drawW = containerSize;
+                        drawH = containerSize / imgAspect;
                     }
+                    const drawX = photoX - drawW / 2;
+                    const drawY = photoY - drawH / 2;
+                    ctx.drawImage(img, drawX, drawY, drawW, drawH);
                 } else {
                     ctx.fillStyle = 'rgba(255,255,255,0.2)';
                     ctx.fill();
