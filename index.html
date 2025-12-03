@@ -1488,11 +1488,7 @@
                 const lon = 10.21;
                 const url = `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${lat}&lon=${lon}`;
                 
-                const response = await fetch(url, {
-                    headers: {
-                        'User-Agent': 'SnomakingApp/1.0'
-                    }
-                });
+                const response = await fetch(url);
                 
                 if (!response.ok) throw new Error('Kunne ikke hente vær');
                 
