@@ -405,251 +405,6 @@
             transform: scale(1.05);
         }
 
-        /* Image Editor Modal */
-        .image-editor-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(15, 22, 36, 0.98);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 3000;
-        }
-
-        .image-editor-modal.show {
-            display: flex;
-            animation: modalFadeIn 0.3s ease-out;
-        }
-
-        .image-editor-content {
-            text-align: center;
-            padding: 2rem;
-            max-width: 400px;
-            width: 90%;
-        }
-
-        .image-editor-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .image-editor-subtitle {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: 1.5rem;
-        }
-
-        .image-editor-preview {
-            width: 220px;
-            height: 220px;
-            border-radius: 50%;
-            margin: 0 auto 1.5rem;
-            border: 4px solid var(--accent-teal);
-            overflow: hidden;
-            position: relative;
-            cursor: grab;
-            background: #1a2940;
-        }
-
-        .image-editor-preview:active { cursor: grabbing; }
-
-        .image-editor-preview img {
-            position: absolute;
-            user-select: none;
-            -webkit-user-drag: none;
-        }
-
-        .image-editor-controls { margin-bottom: 1.5rem; }
-
-        .zoom-control {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .zoom-label {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            min-width: 50px;
-        }
-
-        .zoom-slider {
-            width: 150px;
-            height: 6px;
-            -webkit-appearance: none;
-            background: rgba(255,255,255,0.2);
-            border-radius: 3px;
-            outline: none;
-        }
-
-        .zoom-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: var(--accent-teal);
-            cursor: pointer;
-        }
-
-        .editor-hint {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            opacity: 0.7;
-        }
-
-        .image-editor-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-        }
-
-        .editor-btn {
-            padding: 0.8rem 1.5rem;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: none;
-        }
-
-        .editor-btn-cancel {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-secondary);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .editor-btn-save {
-            background: linear-gradient(135deg, var(--success) 0%, #4fb889 100%);
-            color: var(--bg-gradient-start);
-        }
-
-        .editor-btn-save:hover { transform: scale(1.05); }
-
-        /* Photo upload section */
-        .photos-section {
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--card-border);
-        }
-
-        .photos-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .photos-title {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        .save-photos-btn {
-            background: linear-gradient(135deg, var(--success) 0%, #4fb889 100%);
-            color: var(--bg-gradient-start);
-            border: none;
-            padding: 0.5rem 1.2rem;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .save-photos-btn:hover { transform: scale(1.05); }
-        .save-photos-btn.saved {
-            background: rgba(107, 207, 142, 0.2);
-            color: var(--success);
-        }
-
-        .photos-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-        }
-
-        @media (max-width: 500px) {
-            .photos-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-
-        .photo-upload-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .photo-upload-wrapper {
-            position: relative;
-            width: 80px;
-            height: 80px;
-        }
-
-        .photo-upload-btn {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            border: 3px dashed rgba(255,255,255,0.3);
-            background: rgba(255,255,255,0.05);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            overflow: hidden;
-            position: relative;
-        }
-
-
-        .photo-upload-btn.has-photo {
-            border-style: solid;
-            border-color: var(--success);
-        }
-
-        .photo-upload-btn span {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-            position: relative;
-            overflow: hidden;
-            border-radius: 50%;
-        }
-
-        .photo-upload-input {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        .photo-upload-name {
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-
-        .photo-upload-card:nth-child(1) .photo-upload-name,
-        .photo-upload-card:nth-child(2) .photo-upload-name { color: var(--household-1); }
-        .photo-upload-card:nth-child(3) .photo-upload-name,
-        .photo-upload-card:nth-child(4) .photo-upload-name { color: var(--household-2); }
-
-        .photo-upload-hint {
-            font-size: 0.7rem;
-            color: var(--text-secondary);
-            opacity: 0.7;
-        }
 
         /* Stats & History */
         .stats-section, .history-section {
@@ -730,6 +485,23 @@
         .balance-label span { font-weight: 600; }
         .balance-label.household-1 span { color: var(--household-1); }
         .balance-label.household-2 span { color: var(--household-2); }
+
+        /* Modal buttons */
+        .editor-btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .editor-btn-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
 
         /* Person picker */
         .person-pick-btn {
@@ -989,32 +761,6 @@
     <div class="snowflakes" id="snowflakes"></div>
     <div class="confetti-container" id="confettiContainer"></div>
 
-    <!-- Image Editor Modal -->
-    <!-- Image Editor Modal -->
-    <div class="image-editor-modal" id="imageEditorModal">
-        <div class="image-editor-content">
-            <div class="image-editor-title">📷 Juster bildet</div>
-            <div class="image-editor-subtitle" id="editorPersonName">-</div>
-            
-            <div class="image-editor-preview" id="editorPreview">
-                <img id="editorImage" src="" alt="">
-            </div>
-            
-            <div class="image-editor-controls">
-                <div class="zoom-control">
-                    <span class="zoom-label">Zoom:</span>
-                    <input type="range" class="zoom-slider" id="zoomSlider" min="100" max="300" value="120">
-                    <span class="zoom-label" id="zoomValue">120%</span>
-                </div>
-                <div class="editor-hint">🖱️ Dra bildet for å justere posisjonen</div>
-            </div>
-            
-            <div class="image-editor-buttons">
-                <button class="editor-btn editor-btn-cancel" onclick="cancelEditor()">Avbryt</button>
-                <button class="editor-btn editor-btn-save" onclick="saveEditedImage()">✓ Bruk dette</button>
-            </div>
-        </div>
-    </div>
 
     <!-- Person Picker Modal -->
     <div class="winner-modal" id="personPickerModal">
@@ -1107,37 +853,6 @@
                 </button>
             </div>
             
-            <div class="photos-section">
-                <div class="photos-header">
-                    <div class="photos-title">👥 Deltakerne</div>
-                </div>
-                <div class="photos-grid">
-                    <div class="photo-upload-card">
-                        <div class="photo-upload-wrapper">
-                            <div class="photo-upload-btn has-photo" id="photoBtn1" style="cursor: default;"><span id="photoPreview1"><img src="https://henrietteing.github.io/MakeRoulette/charlotte.png" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></span></div>
-                        </div>
-                        <span class="photo-upload-name">Charlotte</span>
-                    </div>
-                    <div class="photo-upload-card">
-                        <div class="photo-upload-wrapper">
-                            <div class="photo-upload-btn has-photo" id="photoBtn2" style="cursor: default;"><span id="photoPreview2"><img src="https://henrietteing.github.io/MakeRoulette/henriette.png" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></span></div>
-                        </div>
-                        <span class="photo-upload-name">Henriette</span>
-                    </div>
-                    <div class="photo-upload-card">
-                        <div class="photo-upload-wrapper">
-                            <div class="photo-upload-btn has-photo" id="photoBtn3" style="cursor: default;"><span id="photoPreview3"><img src="https://henrietteing.github.io/MakeRoulette/jonas.png" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></span></div>
-                        </div>
-                        <span class="photo-upload-name">Jonas</span>
-                    </div>
-                    <div class="photo-upload-card">
-                        <div class="photo-upload-wrapper">
-                            <div class="photo-upload-btn has-photo" id="photoBtn4" style="cursor: default;"><span id="photoPreview4"><img src="https://henrietteing.github.io/MakeRoulette/kristian.png" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></span></div>
-                        </div>
-                        <span class="photo-upload-name">Kristian</span>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div class="stats-section">
@@ -1195,289 +910,65 @@
             { id: 4, name: 'Kristian', household: 2, emoji: '👨', color: '#e8a87c' }
         ];
 
-        let shovelingData = { history: [], lastHousehold: null, photos: {} };
-        let tempPhotos = {};
-        let photosChanged = false;
+        let shovelingData = { 
+            history: [], 
+            lastHousehold: null
+        };
         let isSpinning = false;
         let currentRotation = 0;
         let loadedImages = {};
 
-        // Editor state
-        let editorState = {
-            personId: null,
-            originalImage: null,
-            zoom: 150,
-            offsetX: 0,
-            offsetY: 0,
-            isDragging: false,
-            imgWidth: 0,
-            imgHeight: 0
-        };
-
         function loadData() {
             const saved = localStorage.getItem('snowShovelingData');
             if (saved) {
-                shovelingData = JSON.parse(saved);
-                tempPhotos = JSON.parse(JSON.stringify(shovelingData.photos));
+                const parsed = JSON.parse(saved);
+                shovelingData = {
+                    history: parsed.history || [],
+                    lastHousehold: parsed.lastHousehold || null
+                };
             }
             updateUI();
-            loadPhotos();
+            loadImagesForWheel();
         }
 
         function saveData() {
-            localStorage.setItem('snowShovelingData', JSON.stringify(shovelingData));
-        }
-
-        // Photo handling
-        function handlePhotoSelect(personId, input) {
-            const file = input.files[0];
-            if (!file) return;
-            
-            if (file.size > 5 * 1024 * 1024) {
-                alert('Bildet er for stort! Maks 5MB.');
-                input.value = '';
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = (e) => openImageEditor(personId, e.target.result);
-            reader.readAsDataURL(file);
-            input.value = '';
-        }
-
-        function openImageEditor(personId, imageData) {
-            const person = people.find(p => p.id === personId);
-            const img = new Image();
-            
-            img.onload = function() {
-                editorState = {
-                    personId,
-                    originalImage: imageData,
-                    zoom: 120,
-                    offsetX: 0,
-                    offsetY: 0,
-                    isDragging: false,
-                    imgWidth: img.width,
-                    imgHeight: img.height
-                };
-
-                document.getElementById('editorPersonName').textContent = person.name;
-                document.getElementById('zoomSlider').value = 120;
-                document.getElementById('zoomValue').textContent = '120%';
-                
-                const editorImg = document.getElementById('editorImage');
-                editorImg.src = imageData;
-                
-                updateEditorPreview();
-                document.getElementById('imageEditorModal').classList.add('show');
-                setupEditorEvents();
-            };
-            img.src = imageData;
-        }
-
-        function updateEditorPreview() {
-            const img = document.getElementById('editorImage');
-            const previewSize = 220;
-            const scale = editorState.zoom / 100;
-            const imgAspect = editorState.imgWidth / editorState.imgHeight;
-            
-            // Cover logic - same as save function
-            let displayWidth, displayHeight;
-            if (imgAspect > 1) {
-                displayHeight = previewSize * scale;
-                displayWidth = displayHeight * imgAspect;
-            } else {
-                displayWidth = previewSize * scale;
-                displayHeight = displayWidth / imgAspect;
-            }
-            
-            const left = (previewSize - displayWidth) / 2 + editorState.offsetX;
-            const top = (previewSize - displayHeight) / 2 + editorState.offsetY;
-            
-            img.style.width = displayWidth + 'px';
-            img.style.height = displayHeight + 'px';
-            img.style.left = left + 'px';
-            img.style.top = top + 'px';
-        }
-
-        function setupEditorEvents() {
-            const preview = document.getElementById('editorPreview');
-            
-            const startDrag = (x, y) => {
-                editorState.isDragging = true;
-                editorState.startX = x - editorState.offsetX;
-                editorState.startY = y - editorState.offsetY;
-            };
-            
-            const moveDrag = (x, y) => {
-                if (!editorState.isDragging) return;
-                editorState.offsetX = x - editorState.startX;
-                editorState.offsetY = y - editorState.startY;
-                updateEditorPreview();
-            };
-            
-            const endDrag = () => { editorState.isDragging = false; };
-
-            preview.onmousedown = (e) => { e.preventDefault(); startDrag(e.clientX, e.clientY); };
-            document.onmousemove = (e) => moveDrag(e.clientX, e.clientY);
-            document.onmouseup = endDrag;
-
-            preview.ontouchstart = (e) => {
-                e.preventDefault();
-                const t = e.touches[0];
-                startDrag(t.clientX, t.clientY);
-            };
-            preview.ontouchmove = (e) => {
-                const t = e.touches[0];
-                moveDrag(t.clientX, t.clientY);
-            };
-            preview.ontouchend = endDrag;
-
-            document.getElementById('zoomSlider').oninput = function() {
-                editorState.zoom = parseInt(this.value);
-                document.getElementById('zoomValue').textContent = editorState.zoom + '%';
-                updateEditorPreview();
-            };
-        }
-
-        function cancelEditor() {
-            document.getElementById('imageEditorModal').classList.remove('show');
-        }
-
-        function saveEditedImage() {
-            // Store original image with transform data - let CSS handle the display
-            tempPhotos[editorState.personId] = {
-                src: editorState.originalImage,
-                zoom: editorState.zoom,
-                offsetX: editorState.offsetX,
-                offsetY: editorState.offsetY,
-                imgWidth: editorState.imgWidth,
-                imgHeight: editorState.imgHeight
-            };
-            
-            photosChanged = true;
-            updatePhotoPreview(editorState.personId);
-            updateSaveButton();
-            loadImagesForWheel();
-            
-            cancelEditor();
-            showToast('Bilde justert! Husk å lagre.');
-        }
-
-        function updatePhotoPreview(personId) {
-            const previewEl = document.getElementById(`photoPreview${personId}`);
-            const btnEl = document.getElementById(`photoBtn${personId}`);
-            const photoData = tempPhotos[personId];
-            
-            if (photoData && photoData.src) {
-                // New format with transform data
-                const containerSize = 74; // 80px - 6px border
-                const scale = photoData.zoom / 100;
-                const imgAspect = photoData.imgWidth / photoData.imgHeight;
-                
-                let imgW, imgH;
-                if (imgAspect > 1) {
-                    imgH = containerSize * scale;
-                    imgW = imgH * imgAspect;
-                } else {
-                    imgW = containerSize * scale;
-                    imgH = imgW / imgAspect;
+            try {
+                localStorage.setItem('snowShovelingData', JSON.stringify(shovelingData));
+            } catch (e) {
+                if (e.name === 'QuotaExceededError') {
+                    alert('⚠️ Lagringsplass full! Prøv å slette noen bilder først, eller kjør denne i konsollen (F12):\nlocalStorage.removeItem("snowShovelingData")');
                 }
-                
-                // Scale offset from editor (220px) to this container
-                const offsetScale = containerSize / 220;
-                const left = (containerSize - imgW) / 2 + (photoData.offsetX * offsetScale);
-                const top = (containerSize - imgH) / 2 + (photoData.offsetY * offsetScale);
-                
-                previewEl.innerHTML = `<img src="${photoData.src}" style="position:absolute; width:${imgW}px; height:${imgH}px; left:${left}px; top:${top}px;">`;
-                btnEl.classList.add('has-photo');
-            } else if (typeof photoData === 'string') {
-                // Old format - just image URL
-                previewEl.innerHTML = `<img src="${photoData}" alt="" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
-                btnEl.classList.add('has-photo');
-            } else {
-                const person = people.find(p => p.id === parseInt(personId));
-                previewEl.innerHTML = person.emoji;
-                btnEl.classList.remove('has-photo');
+                console.error('Lagringsfeil:', e);
             }
-        }
-
-        function updateSaveButton() {
-            const btn = document.getElementById('savePhotosBtn');
-            if (photosChanged) {
-                btn.classList.remove('saved');
-                btn.innerHTML = '💾 Lagre bilder';
-            }
-        }
-
-        function savePhotos() {
-            shovelingData.photos = JSON.parse(JSON.stringify(tempPhotos));
-            saveData();
-            photosChanged = false;
-            
-            // Reload images for wheel
-            loadImagesForWheel();
-            
-            const btn = document.getElementById('savePhotosBtn');
-            btn.classList.add('saved');
-            btn.innerHTML = '✓ Lagret!';
-            
-            showToast('Bilder lagret!');
-            
-            setTimeout(() => {
-                btn.classList.remove('saved');
-                btn.innerHTML = '💾 Lagre bilder';
-            }, 2000);
         }
 
         // Hardcoded photo URLs from GitHub
         const photoUrls = {
-            1: 'https://henrietteing.github.io/MakeRoulette/charlotte.png',
-            2: 'https://henrietteing.github.io/MakeRoulette/henriette.png',
-            3: 'https://henrietteing.github.io/MakeRoulette/jonas.png',
-            4: 'https://henrietteing.github.io/MakeRoulette/kristian.png'
+            1: 'https://henrietteing.github.io/MakeRoulette/Charlotte.png',
+            2: 'https://henrietteing.github.io/MakeRoulette/Henriette.png',
+            3: 'https://henrietteing.github.io/MakeRoulette/Jonas.png',
+            4: 'https://henrietteing.github.io/MakeRoulette/Kristian.png'
         };
-
-        function loadPhotos() {
-            for (let i = 1; i <= 4; i++) {
-                // Use hardcoded URLs - simple string format
-                shovelingData.photos[i] = photoUrls[i];
-                tempPhotos[i] = photoUrls[i];
-                updatePhotoPreview(i);
-            }
-            loadImagesForWheel();
-        }
 
         function loadImagesForWheel() {
             loadedImages = {};
             let loaded = 0;
-            
-            // Always use the hardcoded URLs for the wheel
-            const wheelPhotos = {
-                1: photoUrls[1],
-                2: photoUrls[2],
-                3: photoUrls[3],
-                4: photoUrls[4]
-            };
-            
-            const keys = Object.keys(wheelPhotos);
-            const toLoad = keys.length;
+            const toLoad = 4;
 
-            for (const id of keys) {
-                const src = wheelPhotos[id];
+            for (let id = 1; id <= 4; id++) {
                 const img = new Image();
                 img.crossOrigin = 'anonymous';
                 img.onload = () => {
-                    loadedImages[id] = { img, data: src };
+                    loadedImages[id] = { img };
                     loaded++;
                     if (loaded >= toLoad) drawWheel();
                 };
                 img.onerror = () => {
-                    console.log('Failed to load image:', src);
+                    console.log('Failed to load image:', photoUrls[id]);
                     loaded++;
                     if (loaded >= toLoad) drawWheel();
                 };
-                img.src = src;
+                img.src = photoUrls[id];
             }
         }
 
@@ -1530,12 +1021,11 @@
                 ctx.closePath();
                 ctx.clip();
 
-                if (loadedImages[person.id] || loadedImages[String(person.id)]) {
-                    const imgData = loadedImages[person.id] || loadedImages[String(person.id)];
-                    const img = imgData.img;
-                    const containerSize = photoRadius * 2;
+                if (loadedImages[person.id]) {
+                    const img = loadedImages[person.id].img;
+                    const containerSize = photoRadius * 2; // 140px in wheel
                     
-                    // Draw image centered and covering the circle
+                    // Simple cover - fill the circle with the image
                     const imgAspect = img.width / img.height;
                     let drawW, drawH;
                     if (imgAspect > 1) {
@@ -1692,35 +1182,9 @@
         function showWinnerModal(winner) {
             document.getElementById('winnerName').textContent = winner.name;
             const photoEl = document.getElementById('winnerPhoto');
-            const photoData = shovelingData.photos[winner.id];
             
-            if (photoData) {
-                const containerSize = 170; // 180px - 10px border
-                const src = photoData.src || photoData;
-                
-                if (photoData.zoom) {
-                    // New format with transform
-                    const scale = photoData.zoom / 100;
-                    const imgAspect = photoData.imgWidth / photoData.imgHeight;
-                    let imgW, imgH;
-                    if (imgAspect > 1) {
-                        imgH = containerSize * scale;
-                        imgW = imgH * imgAspect;
-                    } else {
-                        imgW = containerSize * scale;
-                        imgH = imgW / imgAspect;
-                    }
-                    const offsetScale = containerSize / 220;
-                    const left = (containerSize - imgW) / 2 + (photoData.offsetX * offsetScale);
-                    const top = (containerSize - imgH) / 2 + (photoData.offsetY * offsetScale);
-                    photoEl.innerHTML = `<img src="${src}" style="position:absolute; width:${imgW}px; height:${imgH}px; left:${left}px; top:${top}px;">`;
-                } else {
-                    // Old format
-                    photoEl.innerHTML = `<img src="${src}" style="width:100%; height:100%; object-fit:cover;">`;
-                }
-            } else {
-                photoEl.innerHTML = winner.emoji;
-            }
+            // Use hardcoded photo URL
+            photoEl.innerHTML = `<img src="${photoUrls[winner.id]}" style="width:100%; height:100%; object-fit:cover;">`;
             
             document.getElementById('winnerModal').classList.add('show');
             createConfetti();
@@ -1761,31 +1225,7 @@
             
             grid.innerHTML = householdPeople.map(person => {
                 const count = getPersonCount(person.id);
-                const photoData = shovelingData.photos[person.id];
-                let photoHtml;
-                
-                if (photoData && photoData.src) {
-                    // Use same cropping as wheel - 60px container
-                    const containerSize = 60;
-                    const scale = photoData.zoom / 100;
-                    const imgAspect = photoData.imgWidth / photoData.imgHeight;
-                    let imgW, imgH;
-                    if (imgAspect > 1) {
-                        imgH = containerSize * scale;
-                        imgW = imgH * imgAspect;
-                    } else {
-                        imgW = containerSize * scale;
-                        imgH = imgW / imgAspect;
-                    }
-                    const offsetScale = containerSize / 220;
-                    const left = (containerSize - imgW) / 2 + (photoData.offsetX * offsetScale);
-                    const top = (containerSize - imgH) / 2 + (photoData.offsetY * offsetScale);
-                    photoHtml = `<div class="person-pick-photo"><img src="${photoData.src}" style="position:absolute; width:${imgW}px; height:${imgH}px; left:${left}px; top:${top}px;"></div>`;
-                } else if (typeof photoData === 'string') {
-                    photoHtml = `<div class="person-pick-photo"><img src="${photoData}" style="width:100%; height:100%; object-fit:cover;"></div>`;
-                } else {
-                    photoHtml = `<span class="emoji">${person.emoji}</span>`;
-                }
+                const photoHtml = `<div class="person-pick-photo"><img src="${photoUrls[person.id]}" style="width:100%; height:100%; object-fit:cover;"></div>`;
                 
                 return `
                     <button class="person-pick-btn" onclick="confirmShoveling(${person.id})">
@@ -1948,31 +1388,7 @@
             const minCount2 = Math.min(...personCounts2.map(p => p.count));
             
             individualStatsEl.innerHTML = personCounts2.map(person => {
-                const photoData = shovelingData.photos[person.id];
-                let photoHtml;
-                
-                if (photoData && photoData.src) {
-                    const containerSize = 40;
-                    const scale = photoData.zoom / 100;
-                    const imgAspect = photoData.imgWidth / photoData.imgHeight;
-                    let imgW, imgH;
-                    if (imgAspect > 1) {
-                        imgH = containerSize * scale;
-                        imgW = imgH * imgAspect;
-                    } else {
-                        imgW = containerSize * scale;
-                        imgH = imgW / imgAspect;
-                    }
-                    const offsetScale = containerSize / 220;
-                    const left = (containerSize - imgW) / 2 + (photoData.offsetX * offsetScale);
-                    const top = (containerSize - imgH) / 2 + (photoData.offsetY * offsetScale);
-                    photoHtml = `<img src="${photoData.src}" style="position:absolute; width:${imgW}px; height:${imgH}px; left:${left}px; top:${top}px;">`;
-                } else if (typeof photoData === 'string') {
-                    photoHtml = `<img src="${photoData}" style="width:100%; height:100%; object-fit:cover;">`;
-                } else {
-                    photoHtml = person.emoji;
-                }
-                
+                const photoHtml = `<img src="${photoUrls[person.id]}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
                 const isLowest = person.count === minCount2 && total > 0;
                 
                 return `
@@ -2032,9 +1448,8 @@
         }
 
         document.getElementById('winnerModal').onclick = (e) => { if (e.target.id === 'winnerModal') closeWinnerModal(); };
-        document.getElementById('imageEditorModal').onclick = (e) => { if (e.target.id === 'imageEditorModal') cancelEditor(); };
         document.getElementById('personPickerModal').onclick = (e) => { if (e.target.id === 'personPickerModal') closePersonPicker(); };
-        document.onkeydown = (e) => { if (e.key === 'Escape') { closeWinnerModal(); cancelEditor(); closePersonPicker(); } };
+        document.onkeydown = (e) => { if (e.key === 'Escape') { closeWinnerModal(); closePersonPicker(); } };
 
         // Fetch weather from YR/MET Norway API for Danvik, Drammen
         async function fetchWeather() {
@@ -2149,3 +1564,4 @@
     </script>
 </body>
 </html>
+
