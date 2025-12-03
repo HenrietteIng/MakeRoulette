@@ -1,0 +1,2145 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Villa Bjerkebo MåkeRoulette</title>
+    
+    <!-- PWA for iPhone -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MåkeRoulette">
+    <meta name="theme-color" content="#0f1624">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%230f1624' width='100' height='100' rx='20'/><text y='70' x='50' text-anchor='middle' font-size='60'>❄️</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient-start: #0f1624;
+            --bg-gradient-end: #1a2940;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --accent-blue: #5fa8d3;
+            --accent-teal: #62c4c3;
+            --accent-warm: #e8a87c;
+            --text-primary: #f0f4f8;
+            --text-secondary: rgba(240, 244, 248, 0.6);
+            --household-1: #7eb8da;
+            --household-2: #d4a574;
+            --success: #6bcf8e;
+            --wheel-1: #7eb8da;
+            --wheel-2: #62c4c3;
+            --wheel-3: #d4a574;
+            --wheel-4: #e8a87c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Sans 3', sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .snowflakes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .snowflake {
+            position: absolute;
+            top: -10px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 1rem;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(100vh) rotate(360deg); }
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+
+        .next-turn-banner {
+            background: linear-gradient(135deg, rgba(98, 196, 195, 0.15) 0%, rgba(95, 168, 211, 0.15) 100%);
+            border: 1px solid rgba(98, 196, 195, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            animation: fadeIn 0.6s ease-out 0.2s both;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .next-turn-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .next-turn-household {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .next-turn-household.household-1 { color: var(--household-1); }
+        .next-turn-household.household-2 { color: var(--household-2); }
+        
+        .next-turn-reason {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            opacity: 0.8;
+        }
+
+        .households-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 600px) {
+            .households-grid { grid-template-columns: 1fr; }
+        }
+
+        .household-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 1.8rem;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.6s ease-out both;
+        }
+
+        .household-card:nth-child(1) { animation-delay: 0.3s; }
+        .household-card:nth-child(2) { animation-delay: 0.4s; }
+
+        .household-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .household-card.household-1 { border-top: 3px solid var(--household-1); }
+        .household-card.household-2 { border-top: 3px solid var(--household-2); }
+
+        .household-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .household-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .household-1 .household-name { color: var(--household-1); }
+        .household-2 .household-name { color: var(--household-2); }
+
+        .household-count {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .household-members {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.2rem;
+        }
+
+        .register-btn {
+            width: 100%;
+            padding: 0.9rem;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Source Sans 3', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .household-1 .register-btn {
+            background: linear-gradient(135deg, var(--household-1) 0%, #5a9bc4 100%);
+            color: var(--bg-gradient-start);
+        }
+
+        .household-2 .register-btn {
+            background: linear-gradient(135deg, var(--household-2) 0%, #c4915f 100%);
+            color: var(--bg-gradient-start);
+        }
+
+        .register-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .register-btn svg { width: 20px; height: 20px; }
+
+        /* Wheel Section */
+        .wheel-section {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            animation: fadeIn 0.6s ease-out 0.45s both;
+        }
+
+        .wheel-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .wheel-wrapper {
+            position: relative;
+            width: 320px;
+            height: 320px;
+        }
+
+        .wheel-pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            font-size: 2.5rem;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
+
+        .wheel-canvas {
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            box-shadow: 
+                0 0 0 8px rgba(255,255,255,0.1),
+                0 0 0 12px rgba(255,255,255,0.05),
+                0 20px 50px rgba(0,0,0,0.4);
+        }
+
+        .spin-btn {
+            background: linear-gradient(135deg, var(--accent-teal) 0%, var(--accent-blue) 100%);
+            color: var(--bg-gradient-start);
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-family: 'Source Sans 3', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(98, 196, 195, 0.3);
+        }
+
+        .spin-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 12px 35px rgba(98, 196, 195, 0.4);
+        }
+
+        .spin-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Winner Modal */
+        .winner-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 22, 36, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .winner-modal.show {
+            display: flex;
+            animation: modalFadeIn 0.5s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .winner-content {
+            text-align: center;
+            animation: winnerPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.2s both;
+        }
+
+        @keyframes winnerPop {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .winner-label {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+        }
+
+        .winner-photo {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            border: 5px solid var(--success);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            background: rgba(107, 207, 142, 0.2);
+            box-shadow: 0 0 60px rgba(107, 207, 142, 0.4);
+            animation: photoPulse 2s ease-in-out infinite;
+            position: relative;
+        }
+
+        @keyframes photoPulse {
+            0%, 100% { box-shadow: 0 0 60px rgba(107, 207, 142, 0.4); }
+            50% { box-shadow: 0 0 80px rgba(107, 207, 142, 0.6); }
+        }
+
+        .winner-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .winner-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--success);
+            margin-bottom: 0.5rem;
+        }
+
+        .winner-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .winner-close-btn {
+            background: linear-gradient(135deg, var(--success) 0%, #4fb889 100%);
+            color: var(--bg-gradient-start);
+            border: none;
+            padding: 1rem 3rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .winner-close-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Image Editor Modal */
+        .image-editor-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 22, 36, 0.98);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        }
+
+        .image-editor-modal.show {
+            display: flex;
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        .image-editor-content {
+            text-align: center;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .image-editor-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .image-editor-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .image-editor-preview {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            border: 4px solid var(--accent-teal);
+            overflow: hidden;
+            position: relative;
+            cursor: grab;
+            background: #1a2940;
+        }
+
+        .image-editor-preview:active { cursor: grabbing; }
+
+        .image-editor-preview img {
+            position: absolute;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .image-editor-controls { margin-bottom: 1.5rem; }
+
+        .zoom-control {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .zoom-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            min-width: 50px;
+        }
+
+        .zoom-slider {
+            width: 150px;
+            height: 6px;
+            -webkit-appearance: none;
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .zoom-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent-teal);
+            cursor: pointer;
+        }
+
+        .editor-hint {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        .image-editor-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .editor-btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .editor-btn-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .editor-btn-save {
+            background: linear-gradient(135deg, var(--success) 0%, #4fb889 100%);
+            color: var(--bg-gradient-start);
+        }
+
+        .editor-btn-save:hover { transform: scale(1.05); }
+
+        /* Photo upload section */
+        .photos-section {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--card-border);
+        }
+
+        .photos-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .photos-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .save-photos-btn {
+            background: linear-gradient(135deg, var(--success) 0%, #4fb889 100%);
+            color: var(--bg-gradient-start);
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .save-photos-btn:hover { transform: scale(1.05); }
+        .save-photos-btn.saved {
+            background: rgba(107, 207, 142, 0.2);
+            color: var(--success);
+        }
+
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        @media (max-width: 500px) {
+            .photos-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .photo-upload-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .photo-upload-wrapper {
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+
+        .photo-upload-btn {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 3px dashed rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+
+        .photo-upload-btn.has-photo {
+            border-style: solid;
+            border-color: var(--success);
+        }
+
+        .photo-upload-btn span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            border-radius: 50%;
+        }
+
+        .photo-upload-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .photo-upload-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .photo-upload-card:nth-child(1) .photo-upload-name,
+        .photo-upload-card:nth-child(2) .photo-upload-name { color: var(--household-1); }
+        .photo-upload-card:nth-child(3) .photo-upload-name,
+        .photo-upload-card:nth-child(4) .photo-upload-name { color: var(--household-2); }
+
+        .photo-upload-hint {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        /* Stats & History */
+        .stats-section, .history-section {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+            animation: fadeIn 0.6s ease-out 0.5s both;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        @media (max-width: 500px) {
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+        }
+
+        .stat-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-teal);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.3rem;
+        }
+
+        .balance-section {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--card-border);
+        }
+
+        .balance-bar-container {
+            background: rgba(255, 255, 255, 0.1);
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 0.8rem;
+        }
+
+        .balance-bar {
+            height: 100%;
+            display: flex;
+        }
+
+        .balance-bar-1 { background: linear-gradient(90deg, var(--household-1), #5a9bc4); }
+        .balance-bar-2 { background: linear-gradient(90deg, #c4915f, var(--household-2)); }
+
+        .balance-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .balance-label span { font-weight: 600; }
+        .balance-label.household-1 span { color: var(--household-1); }
+        .balance-label.household-2 span { color: var(--household-2); }
+
+        /* Person picker */
+        .person-pick-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1.2rem;
+            border-radius: 16px;
+            border: 2px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .person-pick-btn:hover {
+            border-color: var(--accent-teal);
+            background: rgba(98, 196, 195, 0.15);
+            transform: scale(1.05);
+        }
+        
+        .person-pick-photo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            position: relative;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .person-pick-photo img {
+            position: absolute;
+        }
+        
+        .person-pick-btn .emoji {
+            font-size: 2.5rem;
+        }
+        
+        .person-pick-btn .name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .person-pick-btn .count {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Individual stats */
+        .individual-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.8rem;
+            margin-top: 1.2rem;
+            padding-top: 1.2rem;
+            border-top: 1px solid var(--card-border);
+        }
+        
+        @media (max-width: 500px) {
+            .individual-stats { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+        .individual-stat {
+            text-align: center;
+            padding: 0.8rem;
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+        }
+        
+        .individual-stat-photo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin: 0 auto 0.4rem;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: rgba(255,255,255,0.1);
+            position: relative;
+        }
+        
+        .individual-stat-photo img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .individual-stat-name {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.2rem;
+        }
+        
+        .individual-stat-count {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--accent-teal);
+        }
+        
+        .individual-stat.lowest .individual-stat-count {
+            color: var(--success);
+        }
+        
+        .next-person {
+            font-size: 1rem;
+            color: var(--success);
+            margin-top: 0.5rem;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+        }
+
+        .clear-btn {
+            background: rgba(255, 100, 100, 0.1);
+            border: 1px solid rgba(255, 100, 100, 0.3);
+            color: #ff8888;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .history-list { max-height: 350px; overflow-y: auto; }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            margin-bottom: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover { background: rgba(255, 255, 255, 0.05); }
+
+        .history-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .history-item.household-1 .history-icon { background: rgba(126, 184, 218, 0.2); }
+        .history-item.household-2 .history-icon { background: rgba(212, 165, 116, 0.2); }
+
+        .history-details { flex: 1; }
+
+        .history-household { font-weight: 500; margin-bottom: 0.2rem; }
+        .history-item.household-1 .history-household { color: var(--household-1); }
+        .history-item.household-2 .history-household { color: var(--household-2); }
+
+        .history-date { font-size: 0.85rem; color: var(--text-secondary); }
+
+        .history-delete {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover .history-delete { opacity: 1; }
+        .history-delete:hover { color: #ff8888; background: rgba(255, 100, 100, 0.1); }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .weather-widget {
+            background: linear-gradient(135deg, rgba(95, 168, 211, 0.1) 0%, rgba(98, 196, 195, 0.1) 100%);
+            border: 1px solid rgba(95, 168, 211, 0.2);
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: fadeIn 0.6s ease-out 0.15s both;
+        }
+
+        .weather-info { display: flex; align-items: center; gap: 1rem; }
+        .weather-icon { font-size: 2.5rem; }
+        .weather-details h3 { font-size: 1rem; font-weight: 500; margin-bottom: 0.2rem; }
+        .weather-details p { font-size: 0.85rem; color: var(--text-secondary); }
+
+        .weather-temp {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--accent-blue);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--success);
+            color: var(--bg-gradient-start);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 500;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 100;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 4000;
+            overflow: hidden;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            animation: confettiFall 3s ease-out forwards;
+        }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(-100%) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="snowflakes" id="snowflakes"></div>
+    <div class="confetti-container" id="confettiContainer"></div>
+
+    <!-- Image Editor Modal -->
+    <!-- Image Editor Modal -->
+    <div class="image-editor-modal" id="imageEditorModal">
+        <div class="image-editor-content">
+            <div class="image-editor-title">📷 Juster bildet</div>
+            <div class="image-editor-subtitle" id="editorPersonName">-</div>
+            
+            <div class="image-editor-preview" id="editorPreview">
+                <img id="editorImage" src="" alt="">
+            </div>
+            
+            <div class="image-editor-controls">
+                <div class="zoom-control">
+                    <span class="zoom-label">Zoom:</span>
+                    <input type="range" class="zoom-slider" id="zoomSlider" min="100" max="300" value="120">
+                    <span class="zoom-label" id="zoomValue">120%</span>
+                </div>
+                <div class="editor-hint">🖱️ Dra bildet for å justere posisjonen</div>
+            </div>
+            
+            <div class="image-editor-buttons">
+                <button class="editor-btn editor-btn-cancel" onclick="cancelEditor()">Avbryt</button>
+                <button class="editor-btn editor-btn-save" onclick="saveEditedImage()">✓ Bruk dette</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Person Picker Modal -->
+    <div class="winner-modal" id="personPickerModal">
+        <div class="winner-content" style="max-width: 400px;">
+            <div class="winner-label">Hvem måkte?</div>
+            <div id="personPickerGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0;"></div>
+            <button class="editor-btn editor-btn-cancel" onclick="closePersonPicker()" style="margin-top: 1rem;">Avbryt</button>
+        </div>
+    </div>
+
+    <!-- Winner Modal -->
+    <div class="winner-modal" id="winnerModal">
+        <div class="winner-content">
+            <div class="winner-label">🎉 Gratulerer! Det ble...</div>
+            <div class="winner-photo" id="winnerPhoto">👤</div>
+            <div class="winner-name" id="winnerName">-</div>
+            <div class="winner-subtitle">skal måke snø! ❄️</div>
+            <button class="winner-close-btn" onclick="closeWinnerModal()">Lukk</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>❄️ Villa Bjerkebo MåkeRoulette</h1>
+            <p class="subtitle">Hvem sin tur er det?</p>
+        </header>
+
+        <div class="weather-widget" id="weatherWidget">
+            <div class="weather-info">
+                <span class="weather-icon" id="weatherIcon">🌨️</span>
+                <div class="weather-details">
+                    <h3 id="weatherTitle">Laster vær...</h3>
+                    <p id="weatherDesc">Danvik, Drammen</p>
+                </div>
+            </div>
+            <div class="weather-temp" id="weatherTemp">--°</div>
+        </div>
+
+        <div class="next-turn-banner">
+            <div class="next-turn-label">Neste gang er det</div>
+            <div class="next-turn-household" id="nextTurn">Laster...</div>
+            <div class="next-turn-reason" id="nextTurnReason"></div>
+        </div>
+
+        <div class="households-grid">
+            <div class="household-card household-1">
+                <div class="household-header">
+                    <span class="household-name">Mamas</span>
+                    <span class="household-count" id="count1">0 ganger</span>
+                </div>
+                <p class="household-members">👩 Charlotte & 👩 Henriette</p>
+                <button class="register-btn" onclick="registerShoveling(1)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 5v14M5 12h14"/>
+                    </svg>
+                    Registrer måking
+                </button>
+            </div>
+            
+            <div class="household-card household-2">
+                <div class="household-header">
+                    <span class="household-name">Papas</span>
+                    <span class="household-count" id="count2">0 ganger</span>
+                </div>
+                <p class="household-members">👨 Jonas & 👨 Kristian</p>
+                <button class="register-btn" onclick="registerShoveling(2)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 5v14M5 12h14"/>
+                    </svg>
+                    Registrer måking
+                </button>
+            </div>
+        </div>
+
+        <!-- Lucky Wheel Section -->
+        <div class="wheel-section">
+            <h2 class="section-title">🎡 Lykkehjul</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;">
+                Usikker på hvem som skal måke? La skjebnen bestemme!
+            </p>
+            
+            <div class="wheel-container">
+                <div class="wheel-wrapper">
+                    <div class="wheel-pointer">📍</div>
+                    <canvas id="wheelCanvas" class="wheel-canvas" width="640" height="640"></canvas>
+                </div>
+                
+                <button class="spin-btn" id="spinBtn" onclick="spinWheel()">
+                    🎲 Snurr hjulet!
+                </button>
+            </div>
+            
+            <div class="photos-section">
+                <div class="photos-header">
+                    <div class="photos-title">👥 Deltakerne</div>
+                </div>
+                <div class="photos-grid">
+                    <div class="photo-upload-card">
+                        <div class="photo-upload-wrapper">
+                            <div class="photo-upload-btn has-photo" id="photoBtn1" style="cursor: default;"><span id="photoPreview1">👩</span></div>
+                        </div>
+                        <span class="photo-upload-name">Charlotte</span>
+                    </div>
+                    <div class="photo-upload-card">
+                        <div class="photo-upload-wrapper">
+                            <div class="photo-upload-btn has-photo" id="photoBtn2" style="cursor: default;"><span id="photoPreview2">👩</span></div>
+                        </div>
+                        <span class="photo-upload-name">Henriette</span>
+                    </div>
+                    <div class="photo-upload-card">
+                        <div class="photo-upload-wrapper">
+                            <div class="photo-upload-btn has-photo" id="photoBtn3" style="cursor: default;"><span id="photoPreview3">👨</span></div>
+                        </div>
+                        <span class="photo-upload-name">Jonas</span>
+                    </div>
+                    <div class="photo-upload-card">
+                        <div class="photo-upload-wrapper">
+                            <div class="photo-upload-btn has-photo" id="photoBtn4" style="cursor: default;"><span id="photoPreview4">👨</span></div>
+                        </div>
+                        <span class="photo-upload-name">Kristian</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <h2 class="section-title">📊 Statistikk</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalShoveling">0</div>
+                    <div class="stat-label">Totalt måket</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="thisMonth">0</div>
+                    <div class="stat-label">Denne måneden</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="streak">0</div>
+                    <div class="stat-label">Dager siden sist</div>
+                </div>
+            </div>
+            
+            <div class="balance-section">
+                <div class="balance-bar-container">
+                    <div class="balance-bar">
+                        <div class="balance-bar-1" id="balanceBar1" style="width: 50%"></div>
+                        <div class="balance-bar-2" id="balanceBar2" style="width: 50%"></div>
+                    </div>
+                </div>
+                <div class="balance-labels">
+                    <span class="balance-label household-1">Mamas: <span id="percent1">50%</span></span>
+                    <span class="balance-label household-2">Papas: <span id="percent2">50%</span></span>
+                </div>
+            </div>
+            
+            <!-- Individual stats -->
+            <div class="individual-stats" id="individualStats"></div>
+        </div>
+
+        <div class="history-section">
+            <div class="history-header">
+                <h2 class="section-title">📜 Historikk</h2>
+                <button class="clear-btn" onclick="clearHistory()">Tøm historikk</button>
+            </div>
+            <div class="history-list" id="historyList">
+                <div class="empty-state"><p>Ingen registreringer ennå</p></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">✓ Lagret!</div>
+
+    <script>
+        const people = [
+            { id: 1, name: 'Charlotte', household: 1, emoji: '👩', color: '#7eb8da' },
+            { id: 2, name: 'Henriette', household: 1, emoji: '👩', color: '#62c4c3' },
+            { id: 3, name: 'Jonas', household: 2, emoji: '👨', color: '#d4a574' },
+            { id: 4, name: 'Kristian', household: 2, emoji: '👨', color: '#e8a87c' }
+        ];
+
+        let shovelingData = { history: [], lastHousehold: null, photos: {} };
+        let tempPhotos = {};
+        let photosChanged = false;
+        let isSpinning = false;
+        let currentRotation = 0;
+        let loadedImages = {};
+
+        // Editor state
+        let editorState = {
+            personId: null,
+            originalImage: null,
+            zoom: 150,
+            offsetX: 0,
+            offsetY: 0,
+            isDragging: false,
+            imgWidth: 0,
+            imgHeight: 0
+        };
+
+        function loadData() {
+            const saved = localStorage.getItem('snowShovelingData');
+            if (saved) {
+                shovelingData = JSON.parse(saved);
+                tempPhotos = JSON.parse(JSON.stringify(shovelingData.photos));
+            }
+            updateUI();
+            loadPhotos();
+        }
+
+        function saveData() {
+            localStorage.setItem('snowShovelingData', JSON.stringify(shovelingData));
+        }
+
+        // Photo handling
+        function handlePhotoSelect(personId, input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Bildet er for stort! Maks 5MB.');
+                input.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => openImageEditor(personId, e.target.result);
+            reader.readAsDataURL(file);
+            input.value = '';
+        }
+
+        function openImageEditor(personId, imageData) {
+            const person = people.find(p => p.id === personId);
+            const img = new Image();
+            
+            img.onload = function() {
+                editorState = {
+                    personId,
+                    originalImage: imageData,
+                    zoom: 120,
+                    offsetX: 0,
+                    offsetY: 0,
+                    isDragging: false,
+                    imgWidth: img.width,
+                    imgHeight: img.height
+                };
+
+                document.getElementById('editorPersonName').textContent = person.name;
+                document.getElementById('zoomSlider').value = 120;
+                document.getElementById('zoomValue').textContent = '120%';
+                
+                const editorImg = document.getElementById('editorImage');
+                editorImg.src = imageData;
+                
+                updateEditorPreview();
+                document.getElementById('imageEditorModal').classList.add('show');
+                setupEditorEvents();
+            };
+            img.src = imageData;
+        }
+
+        function updateEditorPreview() {
+            const img = document.getElementById('editorImage');
+            const previewSize = 220;
+            const scale = editorState.zoom / 100;
+            const imgAspect = editorState.imgWidth / editorState.imgHeight;
+            
+            // Cover logic - same as save function
+            let displayWidth, displayHeight;
+            if (imgAspect > 1) {
+                displayHeight = previewSize * scale;
+                displayWidth = displayHeight * imgAspect;
+            } else {
+                displayWidth = previewSize * scale;
+                displayHeight = displayWidth / imgAspect;
+            }
+            
+            const left = (previewSize - displayWidth) / 2 + editorState.offsetX;
+            const top = (previewSize - displayHeight) / 2 + editorState.offsetY;
+            
+            img.style.width = displayWidth + 'px';
+            img.style.height = displayHeight + 'px';
+            img.style.left = left + 'px';
+            img.style.top = top + 'px';
+        }
+
+        function setupEditorEvents() {
+            const preview = document.getElementById('editorPreview');
+            
+            const startDrag = (x, y) => {
+                editorState.isDragging = true;
+                editorState.startX = x - editorState.offsetX;
+                editorState.startY = y - editorState.offsetY;
+            };
+            
+            const moveDrag = (x, y) => {
+                if (!editorState.isDragging) return;
+                editorState.offsetX = x - editorState.startX;
+                editorState.offsetY = y - editorState.startY;
+                updateEditorPreview();
+            };
+            
+            const endDrag = () => { editorState.isDragging = false; };
+
+            preview.onmousedown = (e) => { e.preventDefault(); startDrag(e.clientX, e.clientY); };
+            document.onmousemove = (e) => moveDrag(e.clientX, e.clientY);
+            document.onmouseup = endDrag;
+
+            preview.ontouchstart = (e) => {
+                e.preventDefault();
+                const t = e.touches[0];
+                startDrag(t.clientX, t.clientY);
+            };
+            preview.ontouchmove = (e) => {
+                const t = e.touches[0];
+                moveDrag(t.clientX, t.clientY);
+            };
+            preview.ontouchend = endDrag;
+
+            document.getElementById('zoomSlider').oninput = function() {
+                editorState.zoom = parseInt(this.value);
+                document.getElementById('zoomValue').textContent = editorState.zoom + '%';
+                updateEditorPreview();
+            };
+        }
+
+        function cancelEditor() {
+            document.getElementById('imageEditorModal').classList.remove('show');
+        }
+
+        function saveEditedImage() {
+            // Store original image with transform data - let CSS handle the display
+            tempPhotos[editorState.personId] = {
+                src: editorState.originalImage,
+                zoom: editorState.zoom,
+                offsetX: editorState.offsetX,
+                offsetY: editorState.offsetY,
+                imgWidth: editorState.imgWidth,
+                imgHeight: editorState.imgHeight
+            };
+            
+            photosChanged = true;
+            updatePhotoPreview(editorState.personId);
+            updateSaveButton();
+            loadImagesForWheel();
+            
+            cancelEditor();
+            showToast('Bilde justert! Husk å lagre.');
+        }
+
+        function updatePhotoPreview(personId) {
+            const previewEl = document.getElementById(`photoPreview${personId}`);
+            const btnEl = document.getElementById(`photoBtn${personId}`);
+            const photoData = tempPhotos[personId];
+            
+            if (photoData && photoData.src) {
+                // New format with transform data
+                const containerSize = 74; // 80px - 6px border
+                const scale = photoData.zoom / 100;
+                const imgAspect = photoData.imgWidth / photoData.imgHeight;
+                
+                let imgW, imgH;
+                if (imgAspect > 1) {
+                    imgH = containerSize * scale;
+                    imgW = imgH * imgAspect;
+                } else {
+                    imgW = containerSize * scale;
+                    imgH = imgW / imgAspect;
+                }
+                
+                // Scale offset from editor (220px) to this container
+                const offsetScale = containerSize / 220;
+                const left = (containerSize - imgW) / 2 + (photoData.offsetX * offsetScale);
+                const top = (containerSize - imgH) / 2 + (photoData.offsetY * offsetScale);
+                
+                previewEl.innerHTML = `<img src="${photoData.src}" style="position:absolute; width:${imgW}px; height:${imgH}px; left:${left}px; top:${top}px;">`;
+                btnEl.classList.add('has-photo');
+            } else if (typeof photoData === 'string') {
+                // Old format - just image URL
+                previewEl.innerHTML = `<img src="${photoData}" alt="">`;
+                btnEl.classList.add('has-photo');
+            } else {
+                const person = people.find(p => p.id === parseInt(personId));
+                previewEl.innerHTML = person.emoji;
+                btnEl.classList.remove('has-photo');
+            }
+        }
+
+        function updateSaveButton() {
+            const btn = document.getElementById('savePhotosBtn');
+            if (photosChanged) {
+                btn.classList.remove('saved');
+                btn.innerHTML = '💾 Lagre bilder';
+            }
+        }
+
+        function savePhotos() {
+            shovelingData.photos = JSON.parse(JSON.stringify(tempPhotos));
+            saveData();
+            photosChanged = false;
+            
+            // Reload images for wheel
+            loadImagesForWheel();
+            
+            const btn = document.getElementById('savePhotosBtn');
+            btn.classList.add('saved');
+            btn.innerHTML = '✓ Lagret!';
+            
+            showToast('Bilder lagret!');
+            
+            setTimeout(() => {
+                btn.classList.remove('saved');
+                btn.innerHTML = '💾 Lagre bilder';
+            }, 2000);
+        }
+
+        function loadPhotos() {
+            for (let i = 1; i <= 4; i++) {
+                if (shovelingData.photos[i]) {
+                    tempPhotos[i] = shovelingData.photos[i];
+                    updatePhotoPreview(i);
+                }
+            }
+            loadImagesForWheel();
+        }
+
+        function loadImagesForWheel() {
+            loadedImages = {};
+            let loaded = 0;
+            const photos = shovelingData.photos;
+            const keys = Object.keys(photos);
+            const toLoad = keys.length;
+            
+            if (toLoad === 0) {
+                drawWheel();
+                return;
+            }
+
+            for (const id of keys) {
+                const photoData = photos[id];
+                const src = photoData.src || photoData; // Handle both new and old format
+                const img = new Image();
+                img.onload = () => {
+                    loadedImages[id] = { img, data: photoData };
+                    loaded++;
+                    if (loaded >= toLoad) drawWheel();
+                };
+                img.onerror = () => {
+                    loaded++;
+                    if (loaded >= toLoad) drawWheel();
+                };
+                img.src = src;
+            }
+        }
+
+        // Wheel drawing
+        function drawWheel(rotation = 0) {
+            const canvas = document.getElementById('wheelCanvas');
+            const ctx = canvas.getContext('2d');
+            const size = canvas.width; // 640
+            const center = size / 2;
+            const radius = size / 2 - 10;
+
+            ctx.clearRect(0, 0, size, size);
+            ctx.save();
+            ctx.translate(center, center);
+            ctx.rotate((rotation * Math.PI) / 180);
+
+            const segmentAngle = (Math.PI * 2) / 4;
+
+            for (let i = 0; i < 4; i++) {
+                const startAngle = i * segmentAngle - Math.PI / 2;
+                const endAngle = startAngle + segmentAngle;
+                const person = people[i];
+
+                // Draw segment
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.arc(0, 0, radius, startAngle, endAngle);
+                ctx.closePath();
+                
+                const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, radius);
+                gradient.addColorStop(0, person.color);
+                gradient.addColorStop(1, adjustColor(person.color, -20));
+                ctx.fillStyle = gradient;
+                ctx.fill();
+                
+                ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                // Draw photo circle
+                const midAngle = startAngle + segmentAngle / 2;
+                const photoRadius = 70; // Doubled for higher resolution
+                const photoDistance = radius * 0.6;
+                const photoX = Math.cos(midAngle) * photoDistance;
+                const photoY = Math.sin(midAngle) * photoDistance;
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(photoX, photoY, photoRadius, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.clip();
+
+                if (loadedImages[person.id]) {
+                    const { img, data } = loadedImages[person.id];
+                    const containerSize = photoRadius * 2;
+                    
+                    if (data && data.zoom) {
+                        // New format with transform
+                        const scale = data.zoom / 100;
+                        const imgAspect = data.imgWidth / data.imgHeight;
+                        let imgW, imgH;
+                        if (imgAspect > 1) {
+                            imgH = containerSize * scale;
+                            imgW = imgH * imgAspect;
+                        } else {
+                            imgW = containerSize * scale;
+                            imgH = imgW / imgAspect;
+                        }
+                        const offsetScale = containerSize / 220;
+                        const drawX = photoX - imgW/2 + (data.offsetX * offsetScale);
+                        const drawY = photoY - imgH/2 + (data.offsetY * offsetScale);
+                        ctx.drawImage(img, drawX, drawY, imgW, imgH);
+                    } else {
+                        // Old format - just center the image
+                        ctx.drawImage(img, photoX - photoRadius, photoY - photoRadius, containerSize, containerSize);
+                    }
+                } else {
+                    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                    ctx.fill();
+                    ctx.fillStyle = '#0f1624';
+                    ctx.font = '50px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(person.emoji, photoX, photoY);
+                }
+                ctx.restore();
+
+                // Photo border
+                ctx.beginPath();
+                ctx.arc(photoX, photoY, photoRadius, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+                ctx.lineWidth = 5;
+                ctx.stroke();
+
+                // Name - curved along the outer edge in elegant blue
+                ctx.save();
+                var personName = person.name;
+                var textRadius = radius * 0.90;
+                var letterSpacing = 0.09;
+                var totalAngle = (personName.length - 1) * letterSpacing;
+                var nameStartAngle = midAngle - totalAngle / 2;
+                
+                ctx.font = '600 32px Playfair Display, serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = '#0f1624';
+                
+                for (var k = 0; k < personName.length; k++) {
+                    var charAngle = nameStartAngle + k * letterSpacing;
+                    var cx = Math.cos(charAngle) * textRadius;
+                    var cy = Math.sin(charAngle) * textRadius;
+                    
+                    ctx.save();
+                    ctx.translate(cx, cy);
+                    ctx.rotate(charAngle + Math.PI / 2);
+                    ctx.fillText(personName[k], 0, 0);
+                    ctx.restore();
+                }
+                ctx.restore();
+            }
+
+            // Center circle
+            ctx.beginPath();
+            ctx.arc(0, 0, 70, 0, Math.PI * 2);
+            const centerGrad = ctx.createRadialGradient(0, -20, 0, 0, 0, 70);
+            centerGrad.addColorStop(0, '#ffffff');
+            centerGrad.addColorStop(1, '#d0d0d0');
+            ctx.fillStyle = centerGrad;
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            ctx.fillStyle = '#0f1624';
+            ctx.font = '48px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('❄️', 0, 0);
+
+            ctx.restore();
+        }
+
+        function adjustColor(color, amount) {
+            const hex = color.replace('#', '');
+            const r = Math.max(0, Math.min(255, parseInt(hex.substr(0, 2), 16) + amount));
+            const g = Math.max(0, Math.min(255, parseInt(hex.substr(2, 2), 16) + amount));
+            const b = Math.max(0, Math.min(255, parseInt(hex.substr(4, 2), 16) + amount));
+            return `rgb(${r},${g},${b})`;
+        }
+
+        function spinWheel() {
+            if (isSpinning) return;
+            
+            isSpinning = true;
+            document.getElementById('spinBtn').disabled = true;
+
+            // Random spin amount (5-8 full rotations plus random extra)
+            const extraRotations = (5 + Math.random() * 3) * 360;
+            const randomAngle = Math.random() * 360;
+            const totalRotation = extraRotations + randomAngle;
+
+            const startRotation = currentRotation;
+            const endRotation = startRotation + totalRotation;
+            const duration = 4000;
+            const startTime = Date.now();
+
+            function animate() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Easing function
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const current = startRotation + (totalRotation * eased);
+                
+                drawWheel(current);
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    currentRotation = endRotation;
+                    isSpinning = false;
+                    document.getElementById('spinBtn').disabled = false;
+                    
+                    // Determine winner based on final rotation
+                    // Normalize rotation to 0-360
+                    const normalizedRotation = ((currentRotation % 360) + 360) % 360;
+                    
+                    // The pointer is at top (270° in canvas coords)
+                    // Segments in unrotated wheel:
+                    // - Charlotte (i=0): 270° to 360° (top to right)
+                    // - Henriette (i=1): 0° to 90° (right to bottom)
+                    // - Jonas (i=2): 90° to 180° (bottom to left)
+                    // - Kristian (i=3): 180° to 270° (left to top)
+                    
+                    // Find which segment is at the pointer position (270°)
+                    // When wheel rotates R degrees, the segment at pointer was originally at (270 - R)
+                    const effectiveAngle = ((270 - normalizedRotation) % 360 + 360) % 360;
+                    
+                    let winnerIndex;
+                    if (effectiveAngle >= 270) {
+                        winnerIndex = 0; // Charlotte (270-360)
+                    } else if (effectiveAngle >= 180) {
+                        winnerIndex = 3; // Kristian (180-270)
+                    } else if (effectiveAngle >= 90) {
+                        winnerIndex = 2; // Jonas (90-180)
+                    } else {
+                        winnerIndex = 1; // Henriette (0-90)
+                    }
+                    
+                    const winner = people[winnerIndex];
+                    showWinnerModal(winner);
+                }
+            }
+
+            animate();
+        }
+
+        function showWinnerModal(winner) {
+            document.getElementById('winnerName').textContent = winner.name;
+            const photoEl = document.getElementById('winnerPhoto');
+            const photoData = shovelingData.photos[winner.id];
+            
+            if (photoData) {
+                const containerSize = 170; // 180px - 10px border
+                const src = photoData.src || photoData;
+                
+                if (photoData.zoom) {
+                    // New format with transform
+                    const scale = photoData.zoom / 100;
+                    const imgAspect = photoData.imgWidth / photoData.imgHeight;
+                    let imgW, imgH;
+                    if (imgAspect > 1) {
+                        imgH = containerSize * scale;
+                        imgW = imgH * imgAspect;
+                    } else {
+                        imgW = containerSize * scale;
+                        imgH = imgW / imgAspect;
+                    }
+                    const offsetScale = containerSize / 220;
+                    const left = (containerSize - imgW) / 2 + (photoData.offsetX * offsetScale);
+                    const top = (containerSize - imgH) / 2 + (photoData.offsetY * offsetScale);
+                    photoEl.innerHTML = `<img src="${src}" style="position:absolute; width:${imgW}px; height:${imgH}px; left:${left}px; top:${top}px;">`;
+                } else {
+                    // Old format
+                    photoEl.innerHTML = `<img src="${src}" style="width:100%; height:100%; object-fit:cover;">`;
+                }
+            } else {
+                photoEl.innerHTML = winner.emoji;
+            }
+            
+            document.getElementById('winnerModal').classList.add('show');
+            createConfetti();
+        }
+
+        function closeWinnerModal() {
+            document.getElementById('winnerModal').classList.remove('show');
+        }
+
+        function createConfetti() {
+            const container = document.getElementById('confettiContainer');
+            const colors = ['#7eb8da', '#62c4c3', '#d4a574', '#e8a87c', '#6bcf8e', '#fff'];
+            
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDuration = (2 + Math.random() * 2) + 's';
+                    if (Math.random() > 0.5) confetti.style.borderRadius = '50%';
+                    container.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 20);
+            }
+        }
+
+        let selectedHousehold = null;
+
+        function registerShoveling(household) {
+            selectedHousehold = household;
+            showPersonPicker(household);
+        }
+        
+        function showPersonPicker(household) {
+            const grid = document.getElementById('personPickerGrid');
+            const householdPeople = people.filter(p => p.household === household);
+            
+            grid.innerHTML = householdPeople.map(person => {
+                const count = getPersonCount(person.id);
+                const photoData = shovelingData.photos[person.id];
+                let photoHtml;
+                
+                if (photoData && photoData.src) {
+                    // Use same cropping as wheel - 60px container
+                    const containerSize = 60;
+                    const scale = photoData.zoom / 100;
+                    const imgAspect = photoData.imgWidth / photoData.imgHeight;
+                    let imgW, imgH;
+                    if (imgAspect > 1) {
+                        imgH = containerSize * scale;
+                        imgW = imgH * imgAspect;
+                    } else {
+                        imgW = containerSize * scale;
+                        imgH = imgW / imgAspect;
+                    }
+                    const offsetScale = containerSize / 220;
+                    const left = (containerSize - imgW) / 2 + (photoData.offsetX * offsetScale);
+                    const top = (containerSize - imgH) / 2 + (photoData.offsetY * offsetScale);
+                    photoHtml = `<div class="person-pick-photo"><img src="${photoData.src}" style="position:absolute; width:${imgW}px; height:${imgH}px; left:${left}px; top:${top}px;"></div>`;
+                } else if (typeof photoData === 'string') {
+                    photoHtml = `<div class="person-pick-photo"><img src="${photoData}" style="width:100%; height:100%; object-fit:cover;"></div>`;
+                } else {
+                    photoHtml = `<span class="emoji">${person.emoji}</span>`;
+                }
+                
+                return `
+                    <button class="person-pick-btn" onclick="confirmShoveling(${person.id})">
+                        ${photoHtml}
+                        <span class="name">${person.name}</span>
+                        <span class="count">${count} ${count === 1 ? 'gang' : 'ganger'}</span>
+                    </button>
+                `;
+            }).join('');
+            
+            document.getElementById('personPickerModal').classList.add('show');
+        }
+        
+        function closePersonPicker() {
+            document.getElementById('personPickerModal').classList.remove('show');
+            selectedHousehold = null;
+        }
+        
+        function getPersonCount(personId) {
+            return shovelingData.history.filter(e => e.personId === personId).length;
+        }
+        
+        function confirmShoveling(personId) {
+            const person = people.find(p => p.id === personId);
+            
+            shovelingData.history.unshift({
+                id: Date.now(),
+                personId: personId,
+                personName: person.name,
+                household: person.household,
+                date: new Date().toISOString(),
+                householdName: person.household === 1 ? 'Mamas' : 'Papas'
+            });
+            
+            saveData();
+            updateUI();
+            closePersonPicker();
+            showToast(`${person.name} har måkt! ❄️`);
+        }
+
+        function deleteEntry(id) {
+            shovelingData.history = shovelingData.history.filter(e => e.id !== id);
+            if (shovelingData.history.length > 0) {
+                shovelingData.lastHousehold = shovelingData.history[0].household;
+            } else {
+                shovelingData.lastHousehold = null;
+            }
+            saveData();
+            updateUI();
+        }
+
+        function clearHistory() {
+            if (confirm('Er du sikker på at du vil slette all historikk?')) {
+                shovelingData.history = [];
+                shovelingData.lastHousehold = null;
+                saveData();
+                updateUI();
+            }
+        }
+
+        function updateUI() {
+            const count1 = shovelingData.history.filter(e => e.household === 1).length;
+            const count2 = shovelingData.history.filter(e => e.household === 2).length;
+            const total = count1 + count2;
+
+            document.getElementById('count1').textContent = `${count1} ${count1 === 1 ? 'gang' : 'ganger'}`;
+            document.getElementById('count2').textContent = `${count2} ${count2 === 1 ? 'gang' : 'ganger'}`;
+
+            // Two-level fairness logic:
+            // 1. First determine which HOUSEHOLD should go (based on household counts)
+            // 2. Then within that household, who has done it least
+            
+            const personCounts = people.map(p => ({
+                ...p,
+                count: getPersonCount(p.id)
+            }));
+            
+            const nextTurnEl = document.getElementById('nextTurn');
+            const reasonEl = document.getElementById('nextTurnReason');
+            
+            if (total === 0) {
+                nextTurnEl.textContent = 'Hvem som helst!';
+                nextTurnEl.className = 'next-turn-household';
+                reasonEl.textContent = '';
+            } else {
+                let nextHousehold;
+                
+                // Determine which household should go next
+                if (count1 < count2) {
+                    nextHousehold = 1;
+                } else if (count2 < count1) {
+                    nextHousehold = 2;
+                } else {
+                    // Households are equal - use the wheel or pick randomly
+                    nextHousehold = null;
+                }
+                
+                if (nextHousehold === null) {
+                    // Both households equal - find person with lowest count overall
+                    const minCount = Math.min(...personCounts.map(p => p.count));
+                    const lowestPersons = personCounts.filter(p => p.count === minCount);
+                    
+                    if (lowestPersons.length === 4) {
+                        nextTurnEl.textContent = 'Alle like! Bruk hjulet 🎡';
+                        nextTurnEl.className = 'next-turn-household';
+                        reasonEl.textContent = `Mamas: ${count1} vs Papas: ${count2}`;
+                    } else {
+                        const names = lowestPersons.map(p => p.name).join(' eller ');
+                        nextTurnEl.textContent = names;
+                        nextTurnEl.className = 'next-turn-household';
+                        reasonEl.textContent = `Likt (${count1}-${count2}), velg den med færrest`;
+                    }
+                } else {
+                    // Find person in that household with lowest count
+                    const householdPeople = personCounts.filter(p => p.household === nextHousehold);
+                    const minInHousehold = Math.min(...householdPeople.map(p => p.count));
+                    const candidates = householdPeople.filter(p => p.count === minInHousehold);
+                    
+                    if (candidates.length === 1) {
+                        nextTurnEl.textContent = candidates[0].name;
+                        reasonEl.textContent = `${nextHousehold === 1 ? 'Mamas' : 'Papas'} sin tur (${count1}-${count2}) • ${candidates[0].name}: ${candidates[0].count}x`;
+                    } else {
+                        nextTurnEl.textContent = candidates.map(p => p.name).join(' eller ');
+                        reasonEl.textContent = `${nextHousehold === 1 ? 'Mamas' : 'Papas'} sin tur (${count1}-${count2}) • Begge: ${minInHousehold}x`;
+                    }
+                    nextTurnEl.className = 'next-turn-household household-' + nextHousehold;
+                }
+            }
+
+            document.getElementById('totalShoveling').textContent = total;
+            
+            const now = new Date();
+            const thisMonth = shovelingData.history.filter(e => {
+                const d = new Date(e.date);
+                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+            }).length;
+            document.getElementById('thisMonth').textContent = thisMonth;
+
+            if (shovelingData.history.length > 0) {
+                const lastDate = new Date(shovelingData.history[0].date);
+                document.getElementById('streak').textContent = Math.floor((now - lastDate) / (1000 * 60 * 60 * 24));
+            } else {
+                document.getElementById('streak').textContent = '-';
+            }
+
+            if (total > 0) {
+                const p1 = Math.round((count1 / total) * 100);
+                document.getElementById('balanceBar1').style.width = p1 + '%';
+                document.getElementById('balanceBar2').style.width = (100 - p1) + '%';
+                document.getElementById('percent1').textContent = p1 + '%';
+                document.getElementById('percent2').textContent = (100 - p1) + '%';
+            }
+            
+            // Individual stats
+            const individualStatsEl = document.getElementById('individualStats');
+            const personCounts2 = people.map(p => ({
+                ...p,
+                count: getPersonCount(p.id)
+            }));
+            const minCount2 = Math.min(...personCounts2.map(p => p.count));
+            
+            individualStatsEl.innerHTML = personCounts2.map(person => {
+                const photoData = shovelingData.photos[person.id];
+                let photoHtml;
+                
+                if (photoData && photoData.src) {
+                    const containerSize = 40;
+                    const scale = photoData.zoom / 100;
+                    const imgAspect = photoData.imgWidth / photoData.imgHeight;
+                    let imgW, imgH;
+                    if (imgAspect > 1) {
+                        imgH = containerSize * scale;
+                        imgW = imgH * imgAspect;
+                    } else {
+                        imgW = containerSize * scale;
+                        imgH = imgW / imgAspect;
+                    }
+                    const offsetScale = containerSize / 220;
+                    const left = (containerSize - imgW) / 2 + (photoData.offsetX * offsetScale);
+                    const top = (containerSize - imgH) / 2 + (photoData.offsetY * offsetScale);
+                    photoHtml = `<img src="${photoData.src}" style="position:absolute; width:${imgW}px; height:${imgH}px; left:${left}px; top:${top}px;">`;
+                } else if (typeof photoData === 'string') {
+                    photoHtml = `<img src="${photoData}" style="width:100%; height:100%; object-fit:cover;">`;
+                } else {
+                    photoHtml = person.emoji;
+                }
+                
+                const isLowest = person.count === minCount2 && total > 0;
+                
+                return `
+                    <div class="individual-stat ${isLowest ? 'lowest' : ''}">
+                        <div class="individual-stat-photo">${photoHtml}</div>
+                        <div class="individual-stat-name">${person.name}</div>
+                        <div class="individual-stat-count">${person.count}</div>
+                    </div>
+                `;
+            }).join('');
+
+            const historyList = document.getElementById('historyList');
+            if (shovelingData.history.length === 0) {
+                historyList.innerHTML = '<div class="empty-state"><p>Ingen registreringer ennå</p></div>';
+            } else {
+                historyList.innerHTML = shovelingData.history.map(entry => {
+                    const date = new Date(entry.date);
+                    const formatted = date.toLocaleDateString('no-NO', {
+                        weekday: 'long', day: 'numeric', month: 'long',
+                        hour: '2-digit', minute: '2-digit'
+                    });
+                    const displayName = entry.personName || entry.householdName;
+                    return `
+                        <div class="history-item household-${entry.household}">
+                            <div class="history-icon">🏠</div>
+                            <div class="history-details">
+                                <div class="history-household">${displayName}</div>
+                                <div class="history-date">${formatted}</div>
+                            </div>
+                            <button class="history-delete" onclick="deleteEntry(${entry.id})">🗑️</button>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        function createSnowflakes() {
+            const container = document.getElementById('snowflakes');
+            for (let i = 0; i < 50; i++) {
+                const s = document.createElement('div');
+                s.className = 'snowflake';
+                s.innerHTML = '❄';
+                s.style.left = Math.random() * 100 + '%';
+                s.style.animationDuration = (10 + Math.random() * 10) + 's';
+                s.style.animationDelay = (Math.random() * 10) + 's';
+                s.style.fontSize = (0.5 + Math.random() * 0.8) + 'rem';
+                s.style.opacity = 0.2 + Math.random() * 0.4;
+                container.appendChild(s);
+            }
+        }
+
+        document.getElementById('winnerModal').onclick = (e) => { if (e.target.id === 'winnerModal') closeWinnerModal(); };
+        document.getElementById('imageEditorModal').onclick = (e) => { if (e.target.id === 'imageEditorModal') cancelEditor(); };
+        document.getElementById('personPickerModal').onclick = (e) => { if (e.target.id === 'personPickerModal') closePersonPicker(); };
+        document.onkeydown = (e) => { if (e.key === 'Escape') { closeWinnerModal(); cancelEditor(); closePersonPicker(); } };
+
+        // Fetch weather from YR/MET Norway API for Danvik, Drammen
+        async function fetchWeather() {
+            try {
+                // Danvik, Drammen coordinates
+                const lat = 59.74;
+                const lon = 10.21;
+                const url = `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${lat}&lon=${lon}`;
+                
+                const response = await fetch(url, {
+                    headers: {
+                        'User-Agent': 'SnomakingApp/1.0'
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Kunne ikke hente vær');
+                
+                const data = await response.json();
+                const current = data.properties.timeseries[0];
+                const details = current.data.instant.details;
+                const next1h = current.data.next_1_hours;
+                
+                const temp = Math.round(details.air_temperature);
+                const symbolCode = next1h?.summary?.symbol_code || 'cloudy';
+                
+                // Update UI
+                document.getElementById('weatherTemp').textContent = `${temp}°`;
+                
+                // Map symbol codes to emojis and descriptions
+                const weatherMap = {
+                    'clearsky_day': { icon: '☀️', title: 'Klarvær' },
+                    'clearsky_night': { icon: '🌙', title: 'Klart' },
+                    'fair_day': { icon: '🌤️', title: 'Lettskyet' },
+                    'fair_night': { icon: '🌤️', title: 'Lettskyet' },
+                    'partlycloudy_day': { icon: '⛅', title: 'Delvis skyet' },
+                    'partlycloudy_night': { icon: '⛅', title: 'Delvis skyet' },
+                    'cloudy': { icon: '☁️', title: 'Skyet' },
+                    'fog': { icon: '🌫️', title: 'Tåke' },
+                    'lightrain': { icon: '🌧️', title: 'Lett regn' },
+                    'rain': { icon: '🌧️', title: 'Regn' },
+                    'heavyrain': { icon: '🌧️', title: 'Kraftig regn' },
+                    'lightsleet': { icon: '🌨️', title: 'Lett sludd' },
+                    'sleet': { icon: '🌨️', title: 'Sludd' },
+                    'lightsnow': { icon: '🌨️', title: 'Lett snø' },
+                    'snow': { icon: '❄️', title: 'Snø' },
+                    'heavysnow': { icon: '❄️', title: 'Kraftig snø' },
+                    'lightrainshowers_day': { icon: '🌦️', title: 'Lette regnbyger' },
+                    'rainshowers_day': { icon: '🌦️', title: 'Regnbyger' },
+                    'lightsnowshowers_day': { icon: '🌨️', title: 'Lette snøbyger' },
+                    'snowshowers_day': { icon: '🌨️', title: 'Snøbyger' },
+                };
+                
+                // Find matching weather or use default
+                let weather = { icon: '🌡️', title: 'Været nå' };
+                for (const [key, value] of Object.entries(weatherMap)) {
+                    if (symbolCode.includes(key.replace('_day', '').replace('_night', ''))) {
+                        weather = value;
+                        break;
+                    }
+                }
+                
+                document.getElementById('weatherIcon').textContent = weather.icon;
+                document.getElementById('weatherTitle').textContent = weather.title;
+                
+                // Check if it's snowing - good for shoveling reminder
+                if (symbolCode.includes('snow')) {
+                    document.getElementById('weatherDesc').textContent = 'Tid for snømåking! ❄️';
+                } else if (temp < 0) {
+                    document.getElementById('weatherDesc').textContent = 'Minusgrader i Danvik';
+                } else {
+                    document.getElementById('weatherDesc').textContent = 'Danvik, Drammen';
+                }
+                
+            } catch (error) {
+                console.error('Værhenting feilet:', error);
+                document.getElementById('weatherTitle').textContent = 'Kunne ikke hente vær';
+                document.getElementById('weatherDesc').textContent = 'Danvik, Drammen';
+            }
+        }
+
+        // Password protection
+        function checkPassword() {
+            const correctPassword = 'Villa Bjerkebo';
+            const savedPass = localStorage.getItem('makeroulette_auth');
+            
+            if (savedPass === correctPassword) {
+                return true;
+            }
+            
+            const entered = prompt('🔒 Skriv inn passord for Villa Bjerkebo MåkeRoulette:');
+            if (entered === correctPassword) {
+                localStorage.setItem('makeroulette_auth', correctPassword);
+                return true;
+            } else if (entered !== null) {
+                alert('❌ Feil passord!');
+                document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0f1624;color:white;font-family:sans-serif;"><h1>🔒 Ingen tilgang</h1></div>';
+                return false;
+            }
+            return false;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!checkPassword()) return;
+            
+            loadData();
+            createSnowflakes();
+            drawWheel();
+            fetchWeather();
+            // Oppdater været hver time
+            setInterval(fetchWeather, 3600000);
+        });
+    </script>
+</body>
+</html>
