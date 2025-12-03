@@ -486,6 +486,103 @@
         .balance-label.household-1 span { color: var(--household-1); }
         .balance-label.household-2 span { color: var(--household-2); }
 
+        /* Password Modal */
+        .password-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5000;
+        }
+
+        .password-modal.hidden {
+            display: none;
+        }
+
+        .password-content {
+            text-align: center;
+            padding: 2.5rem;
+            max-width: 350px;
+            width: 90%;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .password-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .password-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .password-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.05);
+            color: var(--text-primary);
+            font-size: 1rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .password-input:focus {
+            border-color: var(--accent-teal);
+        }
+
+        .password-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .password-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--accent-teal) 0%, var(--accent-blue) 100%);
+            color: var(--bg-gradient-start);
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .password-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(98, 196, 195, 0.3);
+        }
+
+        .password-error {
+            color: #ff6b6b;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            min-height: 1.2rem;
+        }
+
         /* Modal buttons */
         .editor-btn {
             padding: 0.8rem 1.5rem;
@@ -763,6 +860,18 @@
     <div class="snowflakes" id="snowflakes"></div>
     <div class="confetti-container" id="confettiContainer"></div>
 
+
+    <!-- Password Modal -->
+    <div class="password-modal" id="passwordModal">
+        <div class="password-content">
+            <div class="password-icon">🔒</div>
+            <h2 class="password-title">Villa Bjerkebo</h2>
+            <p class="password-subtitle">MåkeRoulette</p>
+            <input type="password" id="passwordInput" class="password-input" placeholder="Skriv inn passord">
+            <button class="password-btn" onclick="submitPassword()">Logg inn</button>
+            <p class="password-error" id="passwordError"></p>
+        </div>
+    </div>
 
     <!-- Person Picker Modal -->
     <div class="winner-modal" id="personPickerModal">
@@ -1556,35 +1665,62 @@
         }
 
         // Password protection
+        const correctPassword = 'Villa Bjerkebo';
+
         function checkPassword() {
-            const correctPassword = 'Villa Bjerkebo';
             const savedPass = localStorage.getItem('makeroulette_auth');
             
             if (savedPass === correctPassword) {
+                hidePasswordModal();
+                initApp();
                 return true;
             }
             
-            const entered = prompt('🔒 Skriv inn passord for Villa Bjerkebo MåkeRoulette:');
-            if (entered === correctPassword) {
-                localStorage.setItem('makeroulette_auth', correctPassword);
-                return true;
-            } else if (entered !== null) {
-                alert('❌ Feil passord!');
-                document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0f1624;color:white;font-family:sans-serif;"><h1>🔒 Ingen tilgang</h1></div>';
-                return false;
-            }
+            // Show password modal
+            showPasswordModal();
             return false;
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            if (!checkPassword()) return;
+        function showPasswordModal() {
+            document.getElementById('passwordModal').classList.remove('hidden');
+            document.getElementById('passwordInput').focus();
+        }
+
+        function hidePasswordModal() {
+            document.getElementById('passwordModal').classList.add('hidden');
+        }
+
+        function submitPassword() {
+            const entered = document.getElementById('passwordInput').value;
+            const errorEl = document.getElementById('passwordError');
             
+            if (entered === correctPassword) {
+                localStorage.setItem('makeroulette_auth', correctPassword);
+                hidePasswordModal();
+                initApp();
+            } else {
+                errorEl.textContent = '❌ Feil passord!';
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordInput').focus();
+            }
+        }
+
+        function initApp() {
             loadData();
             createSnowflakes();
             drawWheel();
             fetchWeather();
             // Oppdater været hver time
             setInterval(fetchWeather, 3600000);
+        }
+
+        // Allow Enter key to submit password
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') submitPassword();
+            });
+            
+            checkPassword();
         });
     </script>
 </body>
