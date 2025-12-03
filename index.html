@@ -12,6 +12,10 @@
     <meta name="theme-color" content="#0f1624">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%230f1624' width='100' height='100' rx='20'/><text y='70' x='50' text-anchor='middle' font-size='60'>❄️</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     <style>
         :root {
             --bg-gradient-start: #0f1624;
@@ -1014,6 +1018,21 @@
     <div class="toast" id="toast">✓ Lagret!</div>
 
     <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAUGGhwoQKO1fEaxWKm2S6NHkCYct7NFSU",
+            authDomain: "makeroulette-e8146.firebaseapp.com",
+            databaseURL: "https://makeroulette-e8146-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "makeroulette-e8146",
+            storageBucket: "makeroulette-e8146.firebasestorage.app",
+            messagingSenderId: "971268406452",
+            appId: "1:971268406452:web:00f09c280a85cdba59abe1"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
         const people = [
             { id: 1, name: 'Charlotte', household: 1, emoji: '👩', color: '#7eb8da' },
             { id: 2, name: 'Henriette', household: 1, emoji: '👩', color: '#62c4c3' },
@@ -1030,27 +1049,31 @@
         let loadedImages = {};
 
         function loadData() {
-            const saved = localStorage.getItem('snowShovelingData');
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                shovelingData = {
-                    history: parsed.history || [],
-                    lastHousehold: parsed.lastHousehold || null
-                };
-            }
-            updateUI();
+            // Set up real-time listener for Firebase
+            database.ref('shovelingData').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    shovelingData = {
+                        history: data.history || [],
+                        lastHousehold: data.lastHousehold || null
+                    };
+                } else {
+                    shovelingData = { history: [], lastHousehold: null };
+                }
+                updateUI();
+            });
             loadImagesForWheel();
         }
 
         function saveData() {
-            try {
-                localStorage.setItem('snowShovelingData', JSON.stringify(shovelingData));
-            } catch (e) {
-                if (e.name === 'QuotaExceededError') {
-                    alert('⚠️ Lagringsplass full! Prøv å slette noen bilder først, eller kjør denne i konsollen (F12):\nlocalStorage.removeItem("snowShovelingData")');
-                }
-                console.error('Lagringsfeil:', e);
-            }
+            // Save to Firebase
+            database.ref('shovelingData').set({
+                history: shovelingData.history,
+                lastHousehold: shovelingData.lastHousehold
+            }).catch((error) => {
+                console.error('Firebase lagringsfeil:', error);
+                showToast('⚠️ Kunne ikke lagre til sky');
+            });
         }
 
         // Hardcoded photo URLs from GitHub
